@@ -1,0 +1,253 @@
+:root {
+  --primary-brand-color: #1b52ed;
+
+  --default-background-color: #fff;
+  --default-font-color: #030303;
+
+  --primary-font-color: #1b52ed;
+  --gray-font-color: #a7a7a7;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--default-background-color);
+  color: var(--default-font-color);
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+a,
+a:hover,
+a::after {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+li {
+  list-style: none;
+  padding: 0;
+}
+
+header,
+main {
+  padding: 16px;
+}
+
+.logo {
+  color: var(--primary-brand-color);
+  font-weight: 900;
+}
+
+/* Nav */
+.nav-item-list {
+  margin-top: 16px;
+  min-height: 60px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.nav-item {
+  cursor: pointer;
+}
+.nav-item:hover {
+  font-weight: 600;
+  color: var(--primary-brand-color);
+}
+
+/* Page */
+main {
+  min-height: 70vh;
+}
+
+.content-section-title {
+  width: fit-content;
+  margin: 4rem 0 1rem;
+  padding-right: 2rem;
+  border-bottom: 3px solid var(--primary-brand-color);
+}
+
+.infinite-content-list,
+.content-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 30px;
+}
+
+.ranking-contents .content-list {
+  gap: 12px;
+}
+
+.content-item {
+  cursor: pointer;
+}
+
+.content-title {
+  display: block;
+  overflow: hidden;
+  font-size: 17px;
+  line-height: 24px;
+  padding: 17px 0 2px;
+  cursor: pointer;
+}
+
+.content-thumb {
+  width: 270px;
+  height: 200px;
+  position: relative;
+}
+
+.content-bookmark-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: transparent;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.content-bookmark-btn:hover {
+  color: #bdbdbd;
+}
+
+.content-bookmark-btn.bookmarked {
+  color: #f8d210;
+}
+
+.content-summary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
+  line-height: 1.2em;
+  height: 2.4em;
+}
+
+.BestContents {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 2px;
+}
+
+.ranking-content {
+  display: flex;
+  padding: 16px;
+  background-color: #f5f5f5;
+  min-width: 270px;
+}
+
+.content-rank {
+  font-size: 1.7rem;
+  margin-right: 10px;
+  min-width: 33px;
+  color: var(--primary-brand-color);
+}
+
+.top12 > .content-title {
+  overflow: hidden;
+  font-size: 17px;
+  line-height: 24px;
+  padding: 0;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+/* footer */
+footer {
+  width: 100%;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background-color: var(--primary-brand-color);
+  margin-top: 3rem;
+}
+
+/* EmptyMessage component */
+.empty-msg {
+  text-align: center;
+  color: var(--gray-font-color);
+  min-height: 30vh;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Loading component */
+.loading {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 10;
+  display: none;
+}
+
+.loading .loading-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.loading-wrap .spinner {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  margin: 0 auto;
+  animation: loading 2s linear infinite;
+}
+
+.loading-wrap .bubble-1,
+.loading-wrap .bubble-2 {
+  position: absolute;
+  top: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  background-color: var(--primary-brand-color);
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.loading-wrap .bubble-2 {
+  top: auto;
+  bottom: 0;
+  animation-delay: -1s;
+}
+
+/* animation keyframes */
+@keyframes loading {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
