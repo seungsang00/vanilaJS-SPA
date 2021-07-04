@@ -18,7 +18,7 @@ export default class ContentList extends Component {
   template() {
     return `
       <h2 class="content-section-title">${this.$state.category}</h2>
-      <section data-component="content-list"></section>
+      <section class="content-list" data-component="content-list"></section>
     `;
   }
 
@@ -26,15 +26,23 @@ export default class ContentList extends Component {
     const $list = this.$target.querySelector('[data-component="content-list"]');
     const { data, type, handleBookmark, handleCardClick } = this.$state;
 
-    const hasData = this.data && this.data.length > 0 ? true : false;
+    const hasData = data && data.length > 0 ? true : false;
 
     if (!hasData) {
       this.$state.$emptyMessage = new EmptyMessage($list, { message: 'No Contents :(', visible: !hasData });
       this.$state.$emptyMessage.Visible = !hasData;
     } else {
-      data.forEach((content) => {
-        new ContentCard($list, { data: content, type, handleBookmark, handleCardClick });
-      });
+      $list.innerHTML = data
+        .map((content, index) => {
+          const $card = new ContentCard($list, {
+            data: { ...content, rank: index + 1 },
+            type,
+            handleBookmark,
+            handleCardClick,
+          });
+          return $card.template();
+        })
+        .join('');
     }
   }
 }
