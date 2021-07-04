@@ -1,7 +1,6 @@
 import Component from '../core/Component';
 import ContentCard from './ContentCard';
 import EmptyMessage from './EmptyMessage';
-import { listObserber } from '../utils/obserbers';
 
 const DATA_LIMIT = 40;
 
