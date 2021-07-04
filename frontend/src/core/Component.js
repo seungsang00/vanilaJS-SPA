@@ -2,15 +2,24 @@ export default class Component {
   $target;
   $props;
   $state;
+  $loader;
+  $fields;
+  $io;
 
   constructor($target, $props) {
     this.$target = $target;
     this.$props = $props;
     this.setup();
-    this.setEvent();
     this.render();
-    this.setLoader();
+    this.beforeMounted();
+    this.mounted();
+    this.setEvent();
+
+    window.onpopstate = () => this.onPopState();
+    window.onbeforeunload = () => this.onBeforeUnload();
   }
+  onPopState() {}
+  onBeforeUnload() {}
 
   setup() {}
 
@@ -22,15 +31,14 @@ export default class Component {
 
   render() {
     this.$target.innerHTML = this.template();
-    this.setEvent();
   }
 
   setEvent() {}
 
   setState(newState) {
-    console.log(newState, '상태 업데이트 중');
     this.$state = { ...this.$state, ...newState };
     this.render();
+    this.mounted();
   }
 
   addEvent(eventType, selector, callback) {
@@ -42,5 +50,13 @@ export default class Component {
     });
   }
 
-  setLoader() {}
+  addLoader(loader) {
+    this.$loader = loader;
+  }
+
+  beforeMounted() {}
+
+  setFields(fields) {
+    this.$fields = { ...this.$fields, ...fields };
+  }
 }
