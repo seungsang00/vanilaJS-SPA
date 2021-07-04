@@ -20,10 +20,10 @@ export default class Home extends Component {
 
   mounted() {
     const $lifeContents = document.querySelector('[data-component="life-contents"]');
-    const $foodContents = document.querySelector('[data-component="-contents"]');
-    const $tripContents = document.querySelector('[data-component="-contents"]');
-    const $cultureContents = document.querySelector('[data-component="-contents"]');
-    const $rankingContents = document.querySelector('[data-component="-contents"]');
+    const $foodContents = document.querySelector('[data-component="food-contents"]');
+    const $tripContents = document.querySelector('[data-component="trip-contents"]');
+    const $cultureContents = document.querySelector('[data-component="culture-contents"]');
+    const $rankingContents = document.querySelector('[data-component="ranking-contents"]');
 
     const { lifeContents, foodContents, tripContents, cultureContents, top12Contents } = this.$state;
     const { handleCardClick, handleBookmark } = this.$props;
