@@ -31,6 +31,6 @@ export default class EmptyMessage extends Component {
     this.setEvent();
     const { visible } = this.$state;
     const display = visible === true ? 'block' : 'none';
-    this.$emptyMessage.style.display = display;
+    this.$target.style.display = display;
   }
 }
