@@ -1,51 +1,41 @@
 import api from './api.js';
 
+import Component from './core/Component';
 import Loading from './components/Loading';
 import Navbar from './components/Navbar';
-import Component from './core/Component';
+import Bookmark from './pages/Bookmarks.js';
 import Home from './pages/Home';
+import Sub from './pages/Sub.js';
 
 const LOCAL_KEY_BOOKMARK_CONTENT = 'user-bookmark-contents';
+const SESSION_KEY_CUR_PATH = 'user-current-path';
 const FIRST_PAGE = 1;
-const MAIN_PAGE = '/';
 
 export default class App extends Component {
   setup() {
     this.$state = {
       data: {
-        lifeContents: [],
-        foodContents: [],
-        tripContents: [],
-        cultureContents: [],
-        top12Contents: [],
-        bookmarkContents: [],
+        life: [],
+        food: [],
+        trip: [],
+        culture: [],
+        top12: [],
+        bookmark: [],
       },
       curPage: FIRST_PAGE,
-      currentPath: MAIN_PAGE,
+      currentPath: sessionCurPath,
       $dataLoader: null,
     };
-
-    // window.onpopstate = () => this.onPopState(window.location.pathname);
   }
 
-  // onPopState(path) {
-  //   this.$state.currentPath = path;
-  //   const $main = this.$target.querySelector('[data-component="app-content"]');
-  //   $main.innerHTML = '';
-  //   this.render();
-  // }
+  onPopState() {
+    const pathName = window.location.pathname;
+    this.setState({ currentPath: pathName });
+  }
 
-  // historyRouterPush(pathName) {
-  //   window.history.pushState({}, pathName, window.location.origin + pathName);
-  // }
-
-  // changeTap(path) {
-  //   this.data.currentPath = path;
-  //   this.historyRouterPush(path);
-  //   const $main = this.$target.querySelector('[data-component="app-content"]');
-  //   $main.innerHTML = '';
-  //   this.render();
-  // }
+  historyRouterPush(pathName) {
+    window.history.pushState({}, pathName, window.location.origin + '/' + pathName);
+  }
 
   template() {
     return `
@@ -54,73 +44,110 @@ export default class App extends Component {
         <nav data-component="navigator"></nav>
       </header>
       <main data-component="app-content"></main>
-      <div data-component="loading"></div>
+      <div class="loading" data-component="loading"></div>
       <footer>
         <a class="repo-link" href="https://github.com/seungsang00/zum">Github Repository</a>
       </footer>`;
   }
 
-  setLoader() {
+  beforeMounted() {
     const $loader = this.$target.querySelector('[data-component="loading"]');
-    this.setState({ $dataLoader: new Loading($loader) });
+    this.addLoader(new Loading($loader));
     this.fetchContentsData();
   }
 
   mounted() {
     const $nav = this.$target.querySelector('[data-component="navigator"]');
     const $main = this.$target.querySelector('[data-component="app-content"]');
-    // const $loader = this.$target.querySelector('[data-component="loading"]');
 
     // 자식 컴포넌트 마운트
     new Navbar($nav, {
-      handleRoute: (event) => {
-        const pathName = event.target.getAttribute('route');
-        this.changeTap(pathName);
+      handleRoute: (pathName) => {
+        console.log(pathName);
+        this.historyRouterPush(pathName);
+        this.setState({ currentPath: pathName });
+        window.sessionStorage.setItem(SESSION_KEY_CUR_PATH, pathName);
       },
     });
 
-    // this.setState({ $dataLoader: new Loading($loader) });
-    // this.fetchContentsData();
+    if (this.$state.currentPath === '') {
+      new Home($main, {
+        data: {
+          lifeContents: this.$state.data.life.slice(0, 4),
+          foodContents: this.$state.data.food.slice(0, 4),
+          tripContents: this.$state.data.trip.slice(0, 4),
+          cultureContents: this.$state.data.culture.slice(0, 4),
+          top12Contents: this.$state.data.top,
+        },
+        handleCardClick: this.handleCardClick,
+        handleBookmark: this.handleBookmark,
+      });
+    } else if (this.$state.currentPath === 'life') {
+      this.renderMain($main, 'life');
+    } else if (this.$state.currentPath === 'food') {
+      this.renderMain($main, 'food');
+    } else if (this.$state.currentPath === 'trip') {
+      this.renderMain($main, 'trip');
+    } else if (this.$state.currentPath === 'culture') {
+      this.renderMain($main, 'culture');
+    } else if (this.$state.currentPath === 'bookmark') {
+      new Bookmark($main, {
+        data: this.$state.data.bookmark,
+        handleCardClick: this.handleCardClick,
+        handleBookmark: this.handleBookmark,
+      });
+    }
+  }
 
-    new Home($main, {
-      data: {
-        lifeContents: lifeContents.slice(0, 4),
-        foodContents: foodContents.slice(0, 4),
-        tripContents: tripContents.slice(0, 4),
-        cultureContents: cultureContents.slice(0, 4),
-        top12Contents,
-      },
-      handleCardClick: this.handleCardClick,
-      handleBookmark: this.handleBookmark,
+  renderMain($main, category) {
+    new Sub($main, {
+      data: this.$state.data[category],
+      category,
+      handleCardClick: this.handleCardClick.bind(this),
+      handleBookmark: this.handleBookmark.bind(this),
+      onLastItemShown: this.onLastItemShown.bind(this),
+    });
+  }
+
+  loadLocalStorageData() {
+    const localBookmarkList = localStorage.getItem(LOCAL_KEY_BOOKMARK_CONTENT);
+    if (localBookmarkList) {
+      const loaded = localBookmarkList.split(',');
+      this.setState({ data: { ...this.$state.data, bookmark: loaded } });
+    }
+  }
+
+  fetchContentsData() {
+    this.$loader.Visible = true;
+    api.fetchContents({ category: 'home' }).then(({ data }) => {
+      this.$loader.Visible = false;
+      this.setState({ data: { ...this.$state.data, ...data } });
     });
   }
 
   handleCardClick(url) {
+    // TODO: 상세페이지로 이동
+    // TODO: api.fetchDetail로 상세페이지 데이터 받아오기
     console.log(`move to >>>`, url);
   }
 
   handleBookmark(content) {
-    const { bookmarkContents } = this.$state.data;
-    const newBookmarkContents = bookmarkContents.push(content);
-    window.localStorage.setItem(LOCAL_KEY_BOOKMARK_CONTENT, JSON.stringify(newBookmarkContents));
+    console.log(content);
+    const { bookmark } = this.$state.data;
+    const pushed = bookmark.push(JSON.parse(content));
+    localStorage.setItem(LOCAL_KEY_BOOKMARK_CONTENT, JSON.stringify(pushed));
   }
 
-  fetchContentsData() {
-    this.$state.$dataLoader.Visible = true;
-    api.fetchContents({ category: 'home' }).then(({ data }) => {
-      console.log(data);
-      this.$state.$dataLoader.Visible = false;
-      const { life, food, trip, culture, top } = data;
-      const homeData = {
-        data: {
-          lifeContents: life,
-          foodContents: food,
-          tripContents: trip,
-          cultureContents: culture,
-          top12Contents: top,
-        },
-      };
-      this.setState(homeData);
+  onLastItemShown(category) {
+    this.$loader.Visible = true;
+    api.fetchContents({ category, page: this.$state.curPage + 1 }).then(({ data: nextPageData }) => {
+      this.$loader.Visible = false;
+      this.$state.curPage++; // 성공했으니 진짜 +1
+      const data = this.$state.data[category];
+      console.log(this.$state);
+      const concatData = data.concat(nextPageData);
+      const newData = { ...this.$state.data, [category]: concatData };
+      this.setState({ data: newData });
     });
   }
 }
